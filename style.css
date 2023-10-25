@@ -1,0 +1,65 @@
+
+/* SIDE BAR */
+
+[data-testid=stSidebar] [data-testid=stImage]{
+    text-align: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+}
+
+/* Nome do usuário ativo */
+.st-emotion-cache-nahz7x{
+    font-family: "Source Sans Pro", sans-serif;
+    margin-bottom: -2rem;
+    margin-top: -2rem;
+}
+
+[data-testid=stSidebar] [data-testid=stText]{
+    text-align: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+[data-testid=stSidebar] [data-testid=baseButton-secondary]{
+    text-align: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+section[data-testid="stSidebar"] div.stButton button {
+    width: 200px;
+}
+
+/* Hover do botão */
+.st-emotion-cache-hc3laj:hover{ 
+    border-color: #D93D04;
+    color: #D93D04;
+}
+
+/* ADD BUTTON */
+/* Botão de adicionar item */
+.row-widget.stButton{
+    text-align: end;
+}
+@media only screen and (max-width: 640px){
+    .row-widget.stButton{
+        text-align: start;
+    }
+}
+
+/* DATA TABLE */
+
+.st-emotion-cache-tvhsbf {
+    position: relative;
+    display: block;
+}
+
+.st-emotion-cache-ocqkz7{
+    align-items: center;
+}
+
+
