@@ -17,10 +17,10 @@
 }
 
 [data-testid=stSidebar] [data-testid=stText]{
-    text-align: center;
+    text-align: left;
     display: block;
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 0.5em;
+    
 }
 
 [data-testid=stSidebar] [data-testid=baseButton-secondary]{
@@ -40,11 +40,17 @@ section[data-testid="stSidebar"] div.stButton button {
     color: #D93D04;
 }
 
+.st-emotion-cache-1brye70 {
+    margin-top: 1.5rem;
+}
 /* ADD BUTTON */
 /* Botão de adicionar item */
-.row-widget.stButton{
-    text-align: end;
+
+.row-widget.stButton {
+    text-align: right;
+    padding-top: 1.5em;
 }
+
 @media only screen and (max-width: 640px){
     .row-widget.stButton{
         text-align: start;
