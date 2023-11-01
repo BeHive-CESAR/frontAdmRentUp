@@ -54,12 +54,11 @@ st.markdown("##")
 
 cols = st.columns([1, 1])
 
-
-
 with cols[0]:
     nomes = ['Aluno 1', 'Aluno 2', 'Aluno 3']
     email= ['aluno1@cesar.school', 'aluno2@cesar.school', 'aluno3@cesar.school']
     st.markdown('<p class="mediumFont">Empréstimos Recentes</p>', unsafe_allow_html=True)
+    st.markdown("")
     df = {
         'Aluno': nomes,
         'Email': email,
