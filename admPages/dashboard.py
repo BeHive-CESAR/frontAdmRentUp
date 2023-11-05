@@ -1,10 +1,10 @@
 import streamlit as st
-import plotly.express as px
+import requests
 from PIL import Image
 import pandas as pd
 import numpy as np
+import plotly.express as px
 
-#streamlit run myfile.py
 
 def dashboard():
     with open('style.css') as file:
@@ -104,5 +104,3 @@ def dashboard():
         )
         fig.update_layout(margin=dict(l=20, r=20, t=30, b=0),)
         st.plotly_chart(fig, use_container_width=True)
-        
-dashboard()

@@ -3,29 +3,13 @@ import requests
 from PIL import Image
 import pandas as pd
 import numpy as np
-import json
+import plotly.express as px
+
 
 def inventario():
-    #streamlit run myfile.py
 
     with open('style.css') as file:
         st.markdown(f'<style>{file.read()}</style>', unsafe_allow_html=True)
-
-    st.markdown(
-        """
-        <style>
-            section[data-testid="stSidebar"] {
-                width: 200px !important; # Set the width to your desired value
-            }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
-    # SIDE BAR #
-    with st.sidebar:
-        st.markdown("##")
-        st.text("Olá, Fulano!")
 
 
     # HEADER DO SITE #
@@ -47,26 +31,24 @@ def inventario():
         requestData = requests.get(url).json()
         df = pd.DataFrame.from_dict(requestData)
         array_nomes = df.values[:, 0]
+
         searchInput= st.selectbox('', array_nomes, index = None, placeholder="Buscar Item")
-        editInput= st.selectbox('', array_nomes, index = None, placeholder="Editar Item")
-
-        # FORMS DE EDITAR UM ITEM #
-        if editInput != None:
-            url = f'https://mockapi.up.railway.app/get_item?nome_item={editInput}'
-            response = requests.get(url)
-            item = response.json()
-
-            
         
-            with st.form("Editar", True):
+        editInput= st.selectbox('', array_nomes, index = None, placeholder="Editar Item", key = 'selection')
+        if editInput != None:
+            with st.form("Editar", clear_on_submit=False):
+                url = f'https://mockapi.up.railway.app/get_item?nome_item={editInput}'
+                response = requests.get(url)
+                item = response.json()
+
                 nome = st.text_input('Nome', value= item["item"])
                 total = st.number_input('Total', value = item["qnt_total"], step=1)
-                estoque = st.number_input('Estoque', value = item["qnt_estoque"], max_value= total, step=1)
-                emprestimo = st.number_input('Emprestáveis', value = item["qnt_emprestimo"],max_value= total, step=1)
-                emprestados = st.number_input('Emprestados', value = item["qnt_emprestados"], max_value= emprestimo,step=1)
-                quebrados = st.number_input('Quebrados',value = item["qnt_quebrados"], max_value= total, step=1)
+                estoque = st.number_input('Estoque', value = item["qnt_estoque"], step=1)
+                emprestimo = st.number_input('Emprestáveis', value = item["qnt_emprestimo"], step=1)
+                emprestados = st.number_input('Emprestados', value = item["qnt_emprestados"], step=1)
+                quebrados = st.number_input('Quebrados',value = item["qnt_quebrados"],  step=1)
                 descricao = st.text_input('Descrição', value= item["descricao"])
-
+            
                 submitted = st.form_submit_button("Enviar")
                 if submitted:
                     data = {
@@ -92,7 +74,7 @@ def inventario():
 
                     url = 'https://mockapi.up.railway.app/edit_item'
                     response = requests.put(url, json=data)
-                    
+                        
 
 
         # FORMS DE ADICIONAR UM ITEM #
@@ -142,7 +124,3 @@ def inventario():
             df = df[df["Item"].isin([searchInput])]
         
         st.dataframe(df,hide_index=True,width=1000) 
-
-inventario()
-
-   
