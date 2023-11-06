@@ -1,8 +1,5 @@
 import streamlit as st
-import requests
 from PIL import Image
-import pandas as pd
-import numpy as np
 import plotly.express as px
 
 
@@ -16,17 +13,10 @@ def dashboard():
             font-size:18px !important;
             margin: 0px 0px 0em !important;
         }
-        section[data-testid="stSidebar"] {
-            width: 200px !important; # Set the width to your desired value
-        }
         </style>
         """, 
         unsafe_allow_html=True
     )
-
-    with st.sidebar:
-        st.markdown("##")
-        st.text("Olá, Fulano!")
 
 
     logo_container = st.container()
