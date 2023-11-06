@@ -7,12 +7,11 @@ import webbrowser
 # FUNÇÃO DE LOGIN
 def login():
     st.warning('Adminstrador ou usuário: email = "email",  senha = "senha"')
-    tipo = st.selectbox('Tipo de usuário', ('Administrador', 'Aluno/Professor'))
+    tipo = st.selectbox('Tipo de usuário', ('Administrador', 'Aluno ou Professor'))
 
     #Se for aluno ou professor, redireciona para a outra aplicação
-    if tipo == 'Aluno/Professor':
-        st.write("Redirecionando para login de Aluno/Professor...")
-        webbrowser.open('https://rentup-user.streamlit.app')
+    if tipo == 'Aluno ou Professor':
+        st.link_button("Fazer login como Aluno ou Professor", "https://rentup-user.streamlit.app")
 
     #Se for administrador, pede pra preencher o forms de login
     else:
