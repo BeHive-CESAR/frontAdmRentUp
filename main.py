@@ -11,19 +11,19 @@ def login():
     #Se for aluno ou professor, redireciona para a outra aplicação
     if tipo == 'Aluno/Professor':
         st.write("Redirecionando para login de Aluno/Professor...")
-        webbrowser.open('https://docs.streamlit.io/library/api-reference/widgets/st.selectbox')
+        #webbrowser.open('https://docs.streamlit.io/library/api-reference/widgets/st.selectbox')
 
     #Se for administrador, pede pra preencher o forms de login
     else:
         with st.form("loginForms", True):
-            nome = st.text_input('Nome')
-            senha = st.text_input('Senha')
+            email = st.text_input('Email')
+            senha = st.text_input('Senha',  type="password")
             submitted = st.form_submit_button("Enviar")
             if submitted: #substituir pelo metodo de auth da API
-                if nome == 'nome' and senha == 'senha':
+                if email == 'nome' and senha == 'senha':
                     data = {
                         "usuario": {
-                            "username": nome,
+                            "email": email,
                             "senha": senha
                         }
                     }
@@ -32,8 +32,11 @@ def login():
                     with open('auth_user.json', 'w') as json_file:
                         json.dump(data, json_file, indent=4)
                         st.rerun()
+
+                    
                     return True
                 else:
+                    st.error('Credenciais inválidas')
                     return False
 
 # Se o usuário já estiver logado, o forms de login não aparecerá
