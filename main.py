@@ -6,12 +6,13 @@ import webbrowser
 
 # FUNÇÃO DE LOGIN
 def login():
+    st.warning('Adminstrador ou usuário: email = "email",  senha = "senha"')
     tipo = st.selectbox('Tipo de usuário', ('Administrador', 'Aluno/Professor'))
 
     #Se for aluno ou professor, redireciona para a outra aplicação
     if tipo == 'Aluno/Professor':
         st.write("Redirecionando para login de Aluno/Professor...")
-        #webbrowser.open('https://docs.streamlit.io/library/api-reference/widgets/st.selectbox')
+        webbrowser.open('https://rentup-user.streamlit.app')
 
     #Se for administrador, pede pra preencher o forms de login
     else:
@@ -20,7 +21,7 @@ def login():
             senha = st.text_input('Senha',  type="password")
             submitted = st.form_submit_button("Enviar")
             if submitted: #substituir pelo metodo de auth da API
-                if email == 'nome' and senha == 'senha':
+                if email == 'email' and senha == 'senha':
                     data = {
                         "usuario": {
                             "email": email,
