@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 import plotly.express as px
-
+from api_permissions import get_token, check_status
 
 def dashboard():
     with open('style.css') as file:
