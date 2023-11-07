@@ -1,8 +1,8 @@
 import os
 import json
 import requests 
-import streamlit as st
 
+# Ter acesso ao token para conseguir acessar os metofdos da api
 def get_token():
     if os.path.exists('auth_user'):
         with open("auth_user", "r") as json_file:
@@ -10,6 +10,7 @@ def get_token():
             token = data["token"]
             return token
 
+#Checar se o usuário logou nessa seção (a função basicamente fica logando de vez em quando)
 def check_status():
     if os.path.exists('auth_user'):
         with open("auth_user_data", "r") as json_file:

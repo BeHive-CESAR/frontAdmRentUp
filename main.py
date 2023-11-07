@@ -5,13 +5,12 @@ from PIL import Image
 import requests
 from api_permissions import check_status
 
-# admin@admin.com
-# admin 
-
+# Adminstrador: [admin@admin.com] e [admin]
+# Usuário: [user@user.com] e [user]
 
 # FUNÇÃO DE LOGIN
 def login():
-    st.warning('Adminstrador ou usuário: email = "admin@admin.com",  senha = "admin"')
+
     tipo = st.selectbox('Tipo de usuário', ('Administrador', 'Aluno ou Professor'))
 
     #Se for aluno ou professor, redireciona para a outra aplicação
@@ -35,14 +34,26 @@ def login():
                 
                 response = requests.post(url, json=data)
 
-                if response.status_code == 200:
+                if response.status_code == 200: #Se o usuário for logado com sucesso 
                     output = response.json()
-                    with open("auth_user", "w") as json_file:
+                    with open("auth_user", "w") as json_file: #Escrevendo os dados do usuário em um json
                         json.dump(output, json_file)
-                    with open("auth_user_data", "w") as json_file:
+
+                    with open("auth_user_data", "w") as json_file: #Escrevendo os dados (apenas o email e a senha inserida) do usuário em um json
                         json.dump(data, json_file)
 
-                    st.rerun()
+                    #Verificando se o tipo inserido condiz com o banco de dados
+                    with open("auth_user", "r") as json_file: 
+                        output = json.load(json_file)  
+
+                    user_tipe = output['access']
+
+                    if user_tipe != "ADMINISTRATOR":
+                        os.remove('auth_user')
+                        os.remove('auth_user_data')
+                        st.error("Tipo de usuário informado não condiz com o nosso sistema")
+                    else:
+                        st.rerun()
                 else:
                     st.error("Credenciais Inválidas")
                 
