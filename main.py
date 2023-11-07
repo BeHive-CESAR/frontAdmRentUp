@@ -56,7 +56,47 @@ def login():
                         st.rerun()
                 else:
                     st.error("Credenciais Inválidas")
+                    
+        if st.button("Cadastro"):
+            st.session_state.cadastro = True
+            st.rerun()
+
+def cadastro():
+    #Se for administrador, pede pra preencher o forms de login
+    with st.form("RegisterForms", True):
+        email = st.text_input('Email')    
+        password = st.text_input('Senha',  type="password")
+        name = st.text_input('Nome')  
+        number = st.text_input('Número')  
+
+        submitted = st.form_submit_button("Enviar")
+        
+        if submitted: 
+            url = 'https://mockapi.up.railway.app/user/register'
+
+            data = {
+                "email": email,
+                "password": password,
+                "name": name,
+                "role": "USER",
+                "number": number
+            }
+            
+            response = requests.post(url, json=data)
+            
+            if response.status_code == 200: #Se o usuário for logado com sucesso 
+                st.session_state.cadastro = False
+                st.rerun()
+            else:
+                st.error("Credenciais Inválidas")
                 
+    if st.button("Login"):
+        st.session_state.cadastro = False
+        st.rerun()
+    
+if 'cadastro' not in st.session_state:
+    st.session_state.cadastro = False
+
 # Se o usuário já estiver logado, o forms de login não aparecerá
 if check_status():
     #Definindo a sidebar global da interface do adm
@@ -84,5 +124,14 @@ else:
         with col2:
             image = Image.open('img/logo.png')
             st.image(image, width=150)
-            
-    login()
+    
+    if st.session_state.cadastro == False:
+        login()
+        
+    else:
+        cadastro()
+
+
+    
+    
+    
