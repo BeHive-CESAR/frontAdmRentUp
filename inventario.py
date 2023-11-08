@@ -18,10 +18,12 @@ def inventario():
             st.subheader('Inventário', divider='orange')
            
             adicionarItem = False
+            
             # BARRA DE PESQUISA #
             searchBar_container = st.container()
             with searchBar_container:
-                col1, col2 = st.columns(2)
+                col1, col2 = st.columns([5, 1])
+            
                 with col1:
                     url = 'https://mockapi.up.railway.app/item/get_itens'
                     requestData = requests.get(url, headers=headers).json()
@@ -49,12 +51,12 @@ def inventario():
                     descricao = st.text_input('Descrição')
 
                 # Every form must have a submit button.
-                    cols = st.columns([1,1,1,1,1,1,1])
+                    cols = st.columns([5,1,1])
                     
-                    with cols[5]:
+                    with cols[1]:
                         cancel = st.form_submit_button("Cancelar")
                         
-                    with cols[6]:
+                    with cols[2]:
                         submitted = st.form_submit_button("Enviar")
                         
                     if submitted:

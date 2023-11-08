@@ -1,5 +1,5 @@
 import streamlit as st
-import inventario, dashboard
+import inventario, dashboard, usuarios
 import json, os
 from PIL import Image
 import requests
@@ -25,15 +25,14 @@ def login():
           
             submitted = st.form_submit_button("Enviar")
             if submitted: 
-                url = 'https://mockapi.up.railway.app/user/login'
-
+              
                 data = {
                     "email": email,
                     "password": senha
                 }
-                
-                response = requests.post(url, json=data)
 
+                response = requests.post("https://rentup.up.railway.app/user/login", json=data)
+                
                 if response.status_code == 200: #Se o usuário for logado com sucesso 
                     output = response.json()
                     with open("auth_user", "w") as json_file: #Escrevendo os dados do usuário em um json
@@ -65,34 +64,44 @@ def cadastro():
     #Se for administrador, pede pra preencher o forms de login
     with st.form("RegisterForms", True):
         email = st.text_input('Email')    
+        contato = st.text_input('Número') 
+        nome = st.text_input('Nome')  
         password = st.text_input('Senha',  type="password")
-        name = st.text_input('Nome')  
-        number = st.text_input('Número')  
-
-        submitted = st.form_submit_button("Enviar")
+        st.caption('A senha deve conter uma letra maiúscula e um caractere especial')
         
-        if submitted: 
-            url = 'https://mockapi.up.railway.app/user/register'
+        cols = st.columns([4,1,1])
 
-            data = {
-                "email": email,
-                "password": password,
-                "name": name,
-                "role": "USER",
-                "number": number
-            }
+        with cols[1]:
+            submitted = st.form_submit_button("Cadastrar")
             
-            response = requests.post(url, json=data)
-            
-            if response.status_code == 200: #Se o usuário for logado com sucesso 
+            if submitted: 
+                url = 'https://rentup.up.railway.app/user/register'
+
+                data = {
+                    "email": email,
+                    "password": password,
+                    "nome": nome,
+                    "contato": contato,
+                    "cargo": "USER",
+                    
+                }
+                
+                response = requests.post(url, json=data)
+                
+                if response.status_code == 201: #Se o usuário for logado com sucesso 
+                    st.session_state.cadastro = False
+                    st.rerun()
+                elif response.status_code == 400:
+                    st.error('A solicitação de registro não atende aos requisitos')
+                elif response.status_code == 409:
+                    st.error('Conflito de dados. O endereço de e-mail já está em uso por outro usuário.')
+                else:
+                    st.error("Credenciais Inválidas")
+                    
+        with cols[2]:    
+            if st.form_submit_button("Cancelar"):
                 st.session_state.cadastro = False
                 st.rerun()
-            else:
-                st.error("Credenciais Inválidas")
-                
-    if st.button("Login"):
-        st.session_state.cadastro = False
-        st.rerun()
     
 if 'cadastro' not in st.session_state:
     st.session_state.cadastro = False
@@ -109,7 +118,7 @@ if check_status():
             
         st.markdown("##")
         
-        page = st.selectbox('Selecione uma página:', ('Inventário', 'Dashboard'))
+        page = st.selectbox('Selecione uma página:', ('Usuário', 'Dashboard'))
 
         #Se o usuário deslogar, o arquivo json é removido e pede para fazer login novamente
         if st.button("Logout"):
@@ -119,17 +128,17 @@ if check_status():
 
     if page == 'Dashboard':
         dashboard.dashboard()
-    elif page == 'Inventário':
-        inventario.inventario()
+    # elif page == 'Inventário':
+    #     inventario.inventario()
+    elif page == 'Usuário':
+        usuarios.usuarios()
+        
 
 # Enquanto o usuário não estiver logado, irá pedir para preencher o forms de  login
 else:
     # HEADER DO SITE #
-
-
     if st.session_state.cadastro == False:
-        login()
-        
+        login()  
     else:
         cadastro()
 

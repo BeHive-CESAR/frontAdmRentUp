@@ -82,5 +82,6 @@ def dashboard():
             color_discrete_sequence=px.colors.sequential.RdBu,
             height=300, width=200
         )
+        
         fig.update_layout(margin=dict(l=20, r=20, t=30, b=0),)
         st.plotly_chart(fig, use_container_width=True)

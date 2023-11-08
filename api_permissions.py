@@ -21,7 +21,7 @@ def check_status():
             "password": output['password']
         }
  
-        response = requests.post('https://mockapi.up.railway.app/user/login', json=data)
+        response = requests.post('https://rentup.up.railway.app/user/login', json=data)
 
         if response.status_code == 200:
             output = response.json()
