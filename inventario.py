@@ -14,37 +14,91 @@ def inventario():
 
         with open('style.css') as file:
             st.markdown(f'<style>{file.read()}</style>', unsafe_allow_html=True)
-
-            # HEADER DO SITE #
-            logo_container = st.container()
-            col1, col2, col3 = st.columns(3)
-
-            with logo_container:
-                with col2:
-                    image = Image.open('img/logo.png')
-                    st.image(image, width=150)
-            
+          
             st.subheader('Inventário', divider='orange')
-
+           
+            adicionarItem = False
+            # BARRA DE PESQUISA #
             searchBar_container = st.container()
             with searchBar_container:
+                col1, col2 = st.columns(2)
+                with col1:
+                    url = 'https://mockapi.up.railway.app/item/get_itens'
+                    requestData = requests.get(url, headers=headers).json()
+                    df = pd.DataFrame.from_dict(requestData)
 
-                # BARRA DE PESQUISA #
-                url = 'https://mockapi.up.railway.app/item/get_itens'
+                    array_nomes = df.values[:, 0]
+
+                    searchInput= st.selectbox('', array_nomes, index = None, placeholder="Buscar Item")
+                with col2:
+                    if st.button("Adicionar", use_container_width=True):
+                        adicionarItem = True
+
+            if adicionarItem:
+                with st.form("Adicionar", True):
+                    url = 'https://mockapi.up.railway.app/item/post_item'
+                    
+                    st.text("Adicionar item")
+                    
+                    nome = st.text_input('Nome')
+                    total = st.number_input('Total', step=1)
+                    estoque = st.number_input('Estoque', step=1)
+                    emprestimo = st.number_input('Emprestáveis', step=1)
+                    emprestados = st.number_input('Emprestados',  step=1)
+                    quebrados = st.number_input('Quebrados', step=1)
+                    descricao = st.text_input('Descrição')
+
+                # Every form must have a submit button.
+                    cols = st.columns([1,1,1,1,1,1,1])
+                    
+                    with cols[5]:
+                        cancel = st.form_submit_button("Cancelar")
+                        
+                    with cols[6]:
+                        submitted = st.form_submit_button("Enviar")
+                        
+                    if submitted:
+                        data = {
+                            "item" : nome,
+                            "qnt_total": total,
+                            "qnt_estoque": estoque,
+                            "qnt_emprestimo": emprestimo,
+                            "qnt_emprestados": emprestados,
+                            "qnt_quebrados": quebrados,
+                            "descricao": descricao
+                        }
+                        response = requests.post(url, json=data, headers=headers)
+                    
+                    elif cancel:
+                        st.rerun()
+           
+            
+            # TABELA DOS ITENS #
+            url = 'https://mockapi.up.railway.app/item/get_itens'
+            dataTable_container = st.container()
+            with dataTable_container:
+            
                 requestData = requests.get(url, headers=headers).json()
-                df = pd.DataFrame.from_dict(requestData)
-
-                array_nomes = df.values[:, 0]
-
-                searchInput= st.selectbox('', array_nomes, index = None, placeholder="Buscar Item")
                 
-                editInput= st.selectbox('', array_nomes, index = None, placeholder="Editar Item", key = 'selection')
-                if editInput != None:
+
+                df = pd.DataFrame.from_dict(requestData)
+                df.columns = ['Item', 'Total', 'Em estoque', 'Emprestáveis', 'Emprestados', 'Quebrados', 'Descrição']
+
+
+                if searchInput != None:
+                    df = df[df["Item"].isin([searchInput])]
+                
+                st.dataframe(df,hide_index=True,width=1000) 
+                
+                if searchInput != None:              
+                    # FORMS DE EDITAR UM ITEM #
                     with st.form("Editar", clear_on_submit=False):
-                        url = f'https://mockapi.up.railway.app/item/get_item?nome_item={editInput}'
+                        url = f'https://mockapi.up.railway.app/item/get_item?nome_item={searchInput}'
                         response = requests.get(url,headers=headers)
                         item = response.json()
 
+                        st.write("Editar Item")
+                        
                         nome = st.text_input('Nome', value= item["item"])
                         total = st.number_input('Total', value = item["qnt_total"], step=1)
                         estoque = st.number_input('Estoque', value = item["qnt_estoque"], step=1)
@@ -53,7 +107,7 @@ def inventario():
                         quebrados = st.number_input('Quebrados',value = item["qnt_quebrados"],  step=1)
                         descricao = st.text_input('Descrição', value= item["descricao"])
                     
-                        submitted = st.form_submit_button("Enviar")
+                        submitted = st.form_submit_button("Salvar")
                         if submitted:
                             data = {
                                 "item": {
@@ -78,55 +132,5 @@ def inventario():
 
                             url = 'https://mockapi.up.railway.app/item/edit_item'
                             response = requests.put(url, json=data,headers=headers)
-                                
-
-
-                # FORMS DE ADICIONAR UM ITEM #
-                with st.expander("Adicionar Item"):
-                    with st.form("Adicionar", True):
-                        url = 'https://mockapi.up.railway.app/item/post_item'
-                        nome = st.text_input('Nome')
-                        total = st.number_input('Total', step=1)
-                        estoque = st.number_input('Estoque', step=1)
-                        emprestimo = st.number_input('Emprestáveis', step=1)
-                        emprestados = st.number_input('Emprestados',  step=1)
-                        quebrados = st.number_input('Quebrados', step=1)
-                        descricao = st.text_input('Descrição')
-
-                    # Every form must have a submit button.
-                        submitted = st.form_submit_button("Enviar")
-                        if submitted:
-                                data = {
-                                    "item" : nome,
-                                    "qnt_total": total,
-                                    "qnt_estoque": estoque,
-                                    "qnt_emprestimo": emprestimo,
-                                    "qnt_emprestados": emprestados,
-                                    "qnt_quebrados": quebrados,
-                                    "descricao": descricao
-                                }
-                                response = requests.post(url, json=data, headers=headers)
-
-                    
-
-            st.markdown("##")
-
-            url = 'https://mockapi.up.railway.app/item/get_itens'
-
-            # TABELA DOS ITENS #
-            dataTable_container = st.container()
-            with dataTable_container:
-            
-                requestData = requests.get(url, headers=headers).json()
-                
-
-                df = pd.DataFrame.from_dict(requestData)
-                df.columns = ['Item', 'Total', 'Em estoque', 'Emprestáveis', 'Emprestados', 'Quebrados', 'Descrição']
-
-
-                if searchInput != None:
-                    df = df[df["Item"].isin([searchInput])]
-                
-                st.dataframe(df,hide_index=True,width=1000) 
     else:
         st.rerun()   

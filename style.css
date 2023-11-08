@@ -1,9 +1,17 @@
 
+.st-emotion-cache-1kyxreq{
+    display: block;
+}
+
+.st-emotion-cache-1v0mbdj{
+    align-items: center;
+}
+
 /* Botão de adicionar item */
 .row-widget.stButton {
     text-align: left;
     width: 335.2px;
-    padding-top: 1.8em;
+    margin-top: 0.25em;
 }
 
 @media only screen and (max-width: 640px){

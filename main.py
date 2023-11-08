@@ -101,6 +101,14 @@ if 'cadastro' not in st.session_state:
 if check_status():
     #Definindo a sidebar global da interface do adm
     with st.sidebar:
+        logo_container = st.container()
+        
+        with logo_container: 
+            image = Image.open('img/logo.png')
+            st.image(image, width=150)
+            
+        st.markdown("##")
+        
         page = st.selectbox('Selecione uma página:', ('Inventário', 'Dashboard'))
 
         #Se o usuário deslogar, o arquivo json é removido e pede para fazer login novamente
@@ -117,14 +125,8 @@ if check_status():
 # Enquanto o usuário não estiver logado, irá pedir para preencher o forms de  login
 else:
     # HEADER DO SITE #
-    logo_container = st.container()
-    col1, col2, col3 = st.columns(3)
 
-    with logo_container:
-        with col2:
-            image = Image.open('img/logo.png')
-            st.image(image, width=150)
-    
+
     if st.session_state.cadastro == False:
         login()
         

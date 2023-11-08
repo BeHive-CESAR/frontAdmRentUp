@@ -18,16 +18,6 @@ def dashboard():
         unsafe_allow_html=True
     )
 
-
-    logo_container = st.container()
-    col1, col2, col3 = st.columns(3)
-
-    with logo_container:
-        with col2:
-            image = Image.open('img/logo.png')
-            st.image(image, width=150)
-    
-
         
     st.subheader('Dashboard', divider='orange')
 
