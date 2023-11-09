@@ -4,8 +4,6 @@ import json, os
 from PIL import Image
 import requests
 from api_permissions import check_status
-import webbrowser
-
 
 # Adminstrador: [admin@admin.com] e [Admin100%]
 # Usuário: [user@user.com] e [User100%]
@@ -23,49 +21,53 @@ def login(): # FUNÇÃO DE LOGIN
             st.image(image, width=150)
     
     st.header('Login', divider='orange')
+    
+    tipo = st.selectbox('Tipo de usuário', ('Administrador', 'Aluno ou Professor'))
+    if tipo == 'Aluno ou Professor':
+        st.link_button("Fazer login como Aluno ou Professor", "https://rentup-user.streamlit.app")
+    
+    else:
+        with st.form("loginForms", True):  #Forms de login#
+            email = st.text_input('Email')    
+            senha = st.text_input('Senha',  type="password")
 
-    with st.form("loginForms", True):  #Forms de login#
-        email = st.text_input('Email')    
-        senha = st.text_input('Senha',  type="password")
+            login_cols = st.columns([5,2.5,1])    
+            with login_cols[2]:
+                submitted = st.form_submit_button("Enviar")
 
-        login_cols = st.columns([5,2.5,1])    
-        with login_cols[2]:
-            submitted = st.form_submit_button("Enviar")
-
-        if submitted: 
-            
-            data = {
-                "email": email,
-                "password": senha
-            }
-
-            response = requests.post("https://rentup.up.railway.app/user/login", json=data)
-            
-            if response.status_code == 200: #Se o usuário for logado com sucesso 
-                output = response.json()
-                with open("auth_user", "w") as json_file: #Escrevendo os dados do usuário em um json
-                    json.dump(output, json_file)
-
+            if submitted: 
                 
-                with open("auth_user", "r") as json_file: #Verificando se o tipo inserido condiz com o banco de dados 
-                    output = json.load(json_file)  
+                data = {
+                    "email": email,
+                    "password": senha
+                }
 
-                user_tipe = output['access']
+                response = requests.post("https://rentup.up.railway.app/user/login", json=data)
+                
+                if response.status_code == 200: #Se o usuário for logado com sucesso 
+                    output = response.json()
+                    with open("auth_user", "w") as json_file: #Escrevendo os dados do usuário em um json
+                        json.dump(output, json_file)
 
-                if user_tipe != "ADMINISTRATOR":
-                    os.remove('auth_user')
-                    webbrowser.open('https://www.google.com/search?client=opera-gx&q=google&sourceid=opera&ie=UTF-8&oe=UTF-8')
-                    st.success("Redirecionando você para a página de Alunos/Professores...")
+                    
+                    with open("auth_user", "r") as json_file: #Verificando se o tipo inserido condiz com o banco de dados 
+                        output = json.load(json_file)  
+
+                    user_tipe = output['access']
+
+                    if user_tipe != "ADMINISTRATOR":
+                        os.remove('auth_user')
+                        st.error("Tipo de usuário informado não condiz com o nosso sistema")
+                    else:
+                        st.rerun()
                 else:
-                    st.rerun()
-            else:
-                st.error("Credenciais Inválidas")
+                    st.error("Credenciais Inválidas")
 
-    cancel_cols = st.columns([6, 1])                
-    with cancel_cols[1]:
-        if st.button("Cadastro", type='secondary'):
-            st.session_state.cadastro = True
-            st.rerun()
+        cancel_cols = st.columns([6, 1])                
+        with cancel_cols[1]:
+            if st.button("Cadastro", type='secondary'):
+                st.session_state.cadastro = True
+                st.rerun()
 
 
 def cadastro(): #Função de cadastro
