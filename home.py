@@ -54,7 +54,7 @@ def login(): # FUNÇÃO DE LOGIN
 
                 if user_tipe != "ADMINISTRATOR":
                     os.remove('auth_user')
-                    webbrowser.open_new_tab('https://www.google.com') 
+                    webbrowser.open('https://www.google.com/search?client=opera-gx&q=google&sourceid=opera&ie=UTF-8&oe=UTF-8')
                     st.success("Redirecionando você para a página de Alunos/Professores...")
                 else:
                     st.rerun()
