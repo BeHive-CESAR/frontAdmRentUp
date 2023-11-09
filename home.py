@@ -4,89 +4,85 @@ import json, os
 from PIL import Image
 import requests
 from api_permissions import check_status
+import webbrowser
+
 
 # Adminstrador: [admin@admin.com] e [Admin100%]
 # Usuário: [user@user.com] e [User100%]
 
-# FUNÇÃO DE LOGIN
-def login():
-    with open('style.css') as file:
+def login(): # FUNÇÃO DE LOGIN
+    
+    with open('style.css') as file: #Importando arquivo css
         st.markdown(f'<style>{file.read()}</style>', unsafe_allow_html=True)
 
-    # LOGO #
-    logo_container = st.container()
+    logo_container = st.container() # LOGO #
     with logo_container: 
         logo_cols = st.columns([1,1,1])
         with logo_cols[1]:
             image = Image.open('img/logo.png')
             st.image(image, width=150)
+    
+    st.header('Login', divider='orange')
 
-    tipo = st.selectbox('Tipo de usuário', ('Administrador', 'Aluno ou Professor'))
+    with st.form("loginForms", True):  #Forms de login#
+        email = st.text_input('Email')    
+        senha = st.text_input('Senha',  type="password")
 
-    #Se for aluno ou professor, redireciona para a outra aplicação
-    if tipo == 'Aluno ou Professor':
-        st.link_button("Fazer login como Aluno ou Professor", "https://rentup-user.streamlit.app")
+        login_cols = st.columns([5,2.5,1])    
+        with login_cols[2]:
+            submitted = st.form_submit_button("Enviar")
 
-    #Se for administrador, pede pra preencher o forms de login
-    else:
-        #Forms de login#
-        with st.form("loginForms", True):
-            email = st.text_input('Email')    
-            senha = st.text_input('Senha',  type="password")
+        if submitted: 
+            
+            data = {
+                "email": email,
+                "password": senha
+            }
 
-            login_cols = st.columns([5,2.5,1])    
-            with login_cols[2]:
-                submitted = st.form_submit_button("Enviar")
+            response = requests.post("https://rentup.up.railway.app/user/login", json=data)
+            
+            if response.status_code == 200: #Se o usuário for logado com sucesso 
+                output = response.json()
+                with open("auth_user", "w") as json_file: #Escrevendo os dados do usuário em um json
+                    json.dump(output, json_file)
 
-            if submitted: 
-              
-                data = {
-                    "email": email,
-                    "password": senha
-                }
-
-                response = requests.post("https://rentup.up.railway.app/user/login", json=data)
                 
-                if response.status_code == 200: #Se o usuário for logado com sucesso 
-                    output = response.json()
-                    with open("auth_user", "w") as json_file: #Escrevendo os dados do usuário em um json
-                        json.dump(output, json_file)
+                with open("auth_user", "r") as json_file: #Verificando se o tipo inserido condiz com o banco de dados 
+                    output = json.load(json_file)  
 
-                    #Verificando se o tipo inserido condiz com o banco de dados
-                    with open("auth_user", "r") as json_file: 
-                        output = json.load(json_file)  
+                user_tipe = output['access']
 
-                    user_tipe = output['access']
-
-                    if user_tipe != "ADMINISTRATOR":
-                        os.remove('auth_user')
-                        os.remove('auth_user_data')
-                        st.error("Tipo de usuário informado não condiz com o nosso sistema")
-                    else:
-                        st.rerun()
+                if user_tipe != "ADMINISTRATOR":
+                    os.remove('auth_user')
+                    webbrowser.open_new_tab('https://www.google.com') 
+                    st.success("Redirecionando você para a página de Alunos/Professores...")
                 else:
-                    st.error("Credenciais Inválidas")
+                    st.rerun()
+            else:
+                st.error("Credenciais Inválidas")
 
-        cancel_cols = st.columns([6, 1])                
-        with cancel_cols[1]:
-            if st.button("Cadastro", type='secondary'):
-                st.session_state.cadastro = True
-                st.rerun()
-   
+    cancel_cols = st.columns([6, 1])                
+    with cancel_cols[1]:
+        if st.button("Cadastro", type='secondary'):
+            st.session_state.cadastro = True
+            st.rerun()
 
-def cadastro():
+
+def cadastro(): #Função de cadastro
     with open('style.css') as file:
         st.markdown(f'<style>{file.read()}</style>', unsafe_allow_html=True)
-    # LOGO #
-    logo_container = st.container()
+        
+    
+    logo_container = st.container() # LOGO #
     with logo_container: 
         logo_cols = st.columns([1,1,1])
         with logo_cols[1]:
             image = Image.open('img/logo.png')
             st.image(image, width=150)
 
-    #Se for administrador, pede pra preencher o forms de login
-    with st.form("RegisterForms", True):
+    st.header('Cadastro', divider='orange')
+    
+    with st.form("RegisterForms", True): #Se for administrador, pede pra preencher o forms de login
         email = st.text_input('Email')    
         contato = st.text_input('Número') 
         nome = st.text_input('Nome')  
@@ -103,7 +99,7 @@ def cadastro():
         with cols[2]:
             submitted = st.form_submit_button("Enviar")   
 
-        if submitted: 
+        if submitted: #Lançar os dados pra api autenticar
             url = 'https://rentup.up.railway.app/user/register'
 
             data = {
@@ -115,8 +111,9 @@ def cadastro():
                 
             }
             
-            #Tratamnento de erros#
-            response = requests.post(url, json=data)
+           
+            response = requests.post(url, json=data) #Tratamnento de erros#
+            
             if response.status_code == 201: #Se o usuário for logado com sucesso 
                 st.session_state.cadastro = False
                 st.rerun()
@@ -131,10 +128,10 @@ def cadastro():
 if 'cadastro' not in st.session_state:
     st.session_state.cadastro = False
 
-# Se o usuário já estiver logado, o forms de login não aparecerá
-if check_status():
-    #Definindo a sidebar global da interface do adm
-    with st.sidebar:
+
+if check_status(): # Se o usuário já estiver logado, o forms de login não aparecerá
+   
+    with st.sidebar:  #Definindo a sidebar global da interface do adm
         logo_container = st.container()
         
         with logo_container: 
@@ -145,13 +142,12 @@ if check_status():
         
         page = st.selectbox('Selecione uma página:', ('Dashboard', 'Inventário', 'Usuários'))
 
-        #Se o usuário deslogar, o arquivo json é removido e pede para fazer login novamente
-        if st.button("Logout"):
+        if st.button("Logout"): #Se o usuário deslogar, o arquivo json é removido e pede para fazer login novamente
             os.remove('auth_user')
             st.rerun()
 
-    #Redirecionando para a página escolhida
-    if page == 'Dashboard':
+    
+    if page == 'Dashboard': #Redirecionando para a página escolhida
         dashboard.dashboard()
     elif page == 'Inventário':
         inventario.inventario()
@@ -160,8 +156,9 @@ if check_status():
     elif page == 'Empréstimos':
         emprestimos.emprestimos()
         
-# Enquanto o usuário não estiver logado, irá pedir para preencher o forms de  login
-else:
+
+else: # Enquanto o usuário não estiver logado, irá pedir para preencher o forms de  login
+    
     if st.session_state.cadastro == False:
         login()  
     else:

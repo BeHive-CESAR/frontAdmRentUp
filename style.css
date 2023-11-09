@@ -13,6 +13,11 @@
     width: 0rem;
 }
 
+/* Header de login */
+.st-emotion-cache-10trblm.e1nzilvr1{
+    text-align: center;
+}
+
 .st-emotion-cache-1kyxreq{
     display: block;
 }
@@ -27,7 +32,6 @@
     width: 335.2px;
     margin-top: 0.25em;
 }
-
 @media only screen and (max-width: 640px){
     .row-widget.stButton{
         text-align: start;
