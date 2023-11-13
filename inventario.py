@@ -21,7 +21,7 @@ def inventario():
             col1, col2 = st.columns([5, 1])
         
             with col1:
-                url = 'https://mockapi.up.railway.app/item/get_itens'
+                url = 'https://rentup.up.railway.app/item/get-items'
                 requestData = requests.get(url, headers=headers).json()
                 df = pd.DataFrame.from_dict(requestData)
 
@@ -34,7 +34,7 @@ def inventario():
 
         if adicionarItem:
             with st.form("Adicionar", True):
-                url = 'https://mockapi.up.railway.app/item/post_item'
+                url = 'https://rentup.up.railway.app/item/create-item'
                 
                 st.text("Adicionar item")
                 
@@ -45,6 +45,7 @@ def inventario():
                 emprestados = st.number_input('Emprestados',  step=1)
                 quebrados = st.number_input('Quebrados', step=1)
                 descricao = st.text_input('Descrição')
+                imagem = st.text_input('URL da imagem')
 
             # Every form must have a submit button.
                 cols = st.columns([5,1,1])
@@ -63,7 +64,8 @@ def inventario():
                         "qnt_emprestimo": emprestimo,
                         "qnt_emprestados": emprestados,
                         "qnt_quebrados": quebrados,
-                        "descricao": descricao
+                        "descricao": descricao,
+                        "imagem": imagem
                     }
                     response = requests.post(url, json=data, headers=headers)
 
@@ -75,7 +77,7 @@ def inventario():
         
         
         # TABELA DOS ITENS #
-        url = 'https://mockapi.up.railway.app/item/get_itens'
+        url = 'https://rentup.up.railway.app/item/get-items'
         dataTable_container = st.container()
         with dataTable_container:
         
@@ -94,7 +96,7 @@ def inventario():
             if searchInput != None:              
                 # FORMS DE EDITAR UM ITEM #
                 with st.form("Editar", clear_on_submit=False):
-                    url = f'https://mockapi.up.railway.app/item/get_item?nome_item={searchInput}'
+                    url = f'https://rentup.up.railway.app/item/get-item-by-name?nome={searchInput}'
                     response = requests.get(url,headers=headers)
                     item = response.json()
 
@@ -131,7 +133,7 @@ def inventario():
                             }
                         }
 
-                        url = 'https://mockapi.up.railway.app/item/edit_item'
+                        url = 'https://rentup.up.railway.app/item/edit-item'
                         response = requests.put(url, json=data,headers=headers)
                         if response == 200:
                             st.toast('Item editado com sucesso', icon="✅")

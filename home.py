@@ -110,10 +110,8 @@ def cadastro(): #Função de cadastro
                 "nome": nome,
                 "contato": contato,
                 "cargo": "USER",
-                
             }
-            
-           
+               
             response = requests.post(url, json=data) #Tratamnento de erros#
             
             if response.status_code == 201: #Se o usuário for logado com sucesso 
@@ -165,8 +163,3 @@ else: # Enquanto o usuário não estiver logado, irá pedir para preencher o for
         login()  
     else:
         cadastro()
-
-
-    
-    
-    
