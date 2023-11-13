@@ -44,6 +44,7 @@ def login(): # FUNÇÃO DE LOGIN
 
                 response = requests.post("https://rentup.up.railway.app/user/login", json=data)
                 
+                #Tratamento de erros
                 if response.status_code == 200: #Se o usuário for logado com sucesso 
                     output = response.json()
                     with open("auth_user", "w") as json_file: #Escrevendo os dados do usuário em um json

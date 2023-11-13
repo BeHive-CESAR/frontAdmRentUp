@@ -25,6 +25,13 @@ def inventario():
             with col1:
                 url = 'https://rentup.up.railway.app/item/get-items'
                 requestData = requests.get(url, headers=headers).json()
+
+                if requestData != 200:
+                    if requestData == 404:
+                        st.error("Não foram encontrados itens no estoque")
+                    elif requestData == 403:
+                        st.error("Falha na autenticação. O token de acesso fornecido não é válido.")
+                
                 df = pd.DataFrame.from_dict(requestData["itens"])
 
                 array_nomes = df.values[:, 0]
@@ -74,9 +81,16 @@ def inventario():
                     url = 'https://rentup.up.railway.app/item/create-item'
                     response = requests.post(url, json=data, headers=headers)
 
-                    st.session_state.adicionarItem = False
-                    st.rerun()
-                    
+                    if response == 201:
+                        st.session_state.adicionarItem = False
+                        st.rerun()
+                    elif response == 400:
+                        st.error("A solicitação não atende aos requisitos (por exemplo, campos em branco, formato inválido).")
+                    elif response == 401:
+                        st.error("Acesso não autorizado. Somente administradores podem criar itens.")
+                    elif response == 403:
+                        st.error("Falha na autenticação. O token de acesso fornecido não é válido.")
+                        
                 elif cancel:
                     st.rerun()
     
@@ -84,8 +98,16 @@ def inventario():
         # FORMS DE EDITAR UM ITEM #
         if searchInput != None:              
             with st.form("Editar", clear_on_submit=False):
+
                 url = f'https://rentup.up.railway.app/item/get-item-by-name?item={searchInput}'
                 response = requests.get(url,headers=headers)
+                
+                if response != 200:
+                    if response == 404:
+                        st.error("Nenhum item com o nome especificado foi encontrado no estoque.")
+                    elif response == 403:
+                        st.error("Falha na autenticação. O token de acesso fornecido não é válido.")
+
                 item = response.json()['item']
                 
                 st.write("Editar Item")
@@ -122,20 +144,42 @@ def inventario():
                     
                     if response == 200:
                         st.toast('Item adicionado com sucesso', icon="✅")
+                    elif response == 400:
+                        st.error("A solicitação não atende aos requisitos (por exemplo, campos em branco, formato inválido).")
+                    elif response == 401:
+                        st.error("Acesso não autorizado. Somente administradores podem criar itens.")
+                    elif response == 403:
+                        st.error("Falha na autenticação. O token de acesso fornecido não é válido.")
+                    elif response == 404:
+                        st.error("Nenhum item com o nome original especificado foi encontrado no estoque.")
                     
         # TABELA DOS ITENS #        
-        url = 'https://rentup.up.railway.app/item/get-items'
+        
         dataTable_container = st.container()
         with dataTable_container:
-        
+            
+            url = 'https://rentup.up.railway.app/item/get-items'
             requestData = requests.get(url, headers=headers).json()
             
+            if requestData != 200:
+                if requestData == 404:
+                    st.error("Não foram encontrados itens no estoque.")
+                elif requestData == 403:
+                    st.error("Falha na autenticação. O token de acesso fornecido não é válido.")
+
             df = pd.DataFrame.from_dict(requestData["itens"])
             df.columns = ['Item', 'Total', 'Em estoque', 'Emprestáveis', 'Emprestados', 'Quebrados', 'Descrição', 'Imagem']
 
             if searchInput != None:
                 
                 response = requests.get(f"https://rentup.up.railway.app/item/get-item-by-name?item={searchInput}", headers=headers)
+
+                if response != 200:
+                    if response == 404:
+                        st.error("Nenhum item com o nome especificado foi encontrado no estoque.")
+                    elif response == 403:
+                        st.error("Falha na autenticação. O token de acesso fornecido não é válido.")
+                
                 item = response.json()['item']
 
                 df = pd.DataFrame([item])
