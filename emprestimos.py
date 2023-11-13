@@ -28,4 +28,12 @@ def emprestimos():
             
             
             # TABELA DE EMPRÉSTIMOS #
-            st.warning("Tabela de empréstimos ainda não está disponível")
+            response = requests.get("https://rentup.up.railway.app/rent/history", headers=headers)
+
+            if response.status_code == 200:
+                historico_emprestimos = response.json()
+                for emprestimo in historico_emprestimos:
+                    print(emprestimo)
+            else:
+                print("Nenhum registro de empréstimo encontrado no sistema. Verifique suas permissões de administrador.")
+            

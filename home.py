@@ -5,7 +5,7 @@ from PIL import Image
 import requests
 from api_permissions import check_status
 
-# Adminstrador: [admin@admin.com] e [Admin100%]
+# Adminstrador: [admin@cesar.school] e [Admin123@]
 # Usuário: [user@user.com] e [User100%]
 
 def login(): # FUNÇÃO DE LOGIN
@@ -140,7 +140,7 @@ if check_status(): # Se o usuário já estiver logado, o forms de login não apa
             
         st.markdown("##")
         
-        page = st.selectbox('Selecione uma página:', ('Dashboard', 'Inventário', 'Usuários'))
+        page = st.selectbox('Selecione uma página:', ('Dashboard', 'Inventário', 'Usuários', 'Empréstimos'))
 
         if st.button("Logout"): #Se o usuário deslogar, o arquivo json é removido e pede para fazer login novamente
             os.remove('auth_user')

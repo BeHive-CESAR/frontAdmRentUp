@@ -10,10 +10,12 @@ def inventario():
 
     with open('style.css') as file:
         st.markdown(f'<style>{file.read()}</style>', unsafe_allow_html=True)
-        
+    
+        if 'adicionarItem' not in st.session_state:
+            st.session_state.adicionarItem = False
+
         st.subheader('Inventário', divider='orange')
-        
-        adicionarItem = False
+
         
         # BARRA DE PESQUISA #
         searchBar_container = st.container()
@@ -23,18 +25,18 @@ def inventario():
             with col1:
                 url = 'https://rentup.up.railway.app/item/get-items'
                 requestData = requests.get(url, headers=headers).json()
-                df = pd.DataFrame.from_dict(requestData)
+                df = pd.DataFrame.from_dict(requestData["itens"])
 
                 array_nomes = df.values[:, 0]
 
                 searchInput= st.selectbox('', array_nomes, index = None, placeholder="Buscar Item")
             with col2:
                 if st.button("Adicionar", use_container_width=True):
-                    adicionarItem = True
+                    st.session_state.adicionarItem = True
+                    #st.rerun()
 
-        if adicionarItem:
+        if st.session_state.adicionarItem == True:
             with st.form("Adicionar", True):
-                url = 'https://rentup.up.railway.app/item/create-item'
                 
                 st.text("Adicionar item")
                 
@@ -47,7 +49,7 @@ def inventario():
                 descricao = st.text_input('Descrição')
                 imagem = st.text_input('URL da imagem')
 
-            # Every form must have a submit button.
+        
                 cols = st.columns([5,1,1])
                 
                 with cols[1]:
@@ -57,83 +59,92 @@ def inventario():
                     submitted = st.form_submit_button("Enviar")
                     
                 if submitted:
-                    data = {
-                        "item" : nome,
-                        "qnt_total": total,
-                        "qnt_estoque": estoque,
-                        "qnt_emprestimo": emprestimo,
-                        "qnt_emprestados": emprestados,
-                        "qnt_quebrados": quebrados,
+                
+                    data = {     
+                        "nome": nome,
+                        "qntTotal": total,
+                        "qntEstoque": estoque,
+                        "qntEmprestar": emprestimo,
+                        "qntEmprestados": emprestados,
+                        "qntDanificados": quebrados,
                         "descricao": descricao,
                         "imagem": imagem
                     }
+
+                    url = 'https://rentup.up.railway.app/item/create-item'
                     response = requests.post(url, json=data, headers=headers)
 
-                    if response == 200:
-                        st.toast('Item adicionado com sucesso', icon="✅")
-                
+                    st.session_state.adicionarItem = False
+                    st.rerun()
+                    
                 elif cancel:
                     st.rerun()
+    
         
-        
-        # TABELA DOS ITENS #
+        # FORMS DE EDITAR UM ITEM #
+        if searchInput != None:              
+            with st.form("Editar", clear_on_submit=False):
+                url = f'https://rentup.up.railway.app/item/get-item-by-name?item={searchInput}'
+                response = requests.get(url,headers=headers)
+                item = response.json()['item']
+                
+                st.write("Editar Item")
+                
+                nome = st.text_input('Nome', value = item["nome_item"])
+                total = st.number_input('Total', value = item["qnt_total"], step=1)
+                estoque = st.number_input('Estoque', value =  item["qnt_estoque"], step=1)
+                emprestimo = st.number_input('Emprestáveis', value =  item["qnt_emprestar"], step=1)
+                emprestados = st.number_input('Emprestados', value =  item["qnt_emprestados"], step=1)
+                quebrados = st.number_input('Quebrados',value =  item["qnt_danificados"],  step=1)
+                descricao = st.text_input('Descrição', value=  item["descricao"])      
+                imagem = st.text_input('URL da Imagem')
+            
+
+                if st.form_submit_button("Salvar"):
+                    data = {                  
+                        "item1": {
+                            "nome": item["nome_item"]
+                        },
+                        "item2": {
+                            "nome": nome,
+                            "qntTotal": total,
+                            "qntEstoque": estoque,
+                            "qntEmprestar": emprestimo,
+                            "qntEmprestados": emprestados,
+                            "qntDanificados": quebrados,
+                            "descricao": descricao,
+                            "imagem": imagem
+                        }
+                    }
+
+                    url = 'https://rentup.up.railway.app/item/edit-item'
+                    response = requests.put(url, json=data,headers=headers)
+                    
+                    if response == 200:
+                        st.toast('Item adicionado com sucesso', icon="✅")
+                    
+        # TABELA DOS ITENS #        
         url = 'https://rentup.up.railway.app/item/get-items'
         dataTable_container = st.container()
         with dataTable_container:
         
             requestData = requests.get(url, headers=headers).json()
             
-
-            df = pd.DataFrame.from_dict(requestData)
-            df.columns = ['Item', 'Total', 'Em estoque', 'Emprestáveis', 'Emprestados', 'Quebrados', 'Descrição']
-
+            df = pd.DataFrame.from_dict(requestData["itens"])
+            df.columns = ['Item', 'Total', 'Em estoque', 'Emprestáveis', 'Emprestados', 'Quebrados', 'Descrição', 'Imagem']
 
             if searchInput != None:
-                df = df[df["Item"].isin([searchInput])]
-            
+                
+                response = requests.get(f"https://rentup.up.railway.app/item/get-item-by-name?item={searchInput}", headers=headers)
+                item = response.json()['item']
+
+                df = pd.DataFrame([item])
+                df.columns = ['Item', 'Total', 'Em estoque', 'Emprestáveis', 'Emprestados', 'Quebrados', 'Descrição', 'Imagem']
+               
+                
+             # Criar DataFrame
             st.dataframe(df,hide_index=True,width=1000) 
             
-            if searchInput != None:              
-                # FORMS DE EDITAR UM ITEM #
-                with st.form("Editar", clear_on_submit=False):
-                    url = f'https://rentup.up.railway.app/item/get-item-by-name?nome={searchInput}'
-                    response = requests.get(url,headers=headers)
-                    item = response.json()
 
-                    st.write("Editar Item")
-                    
-                    nome = st.text_input('Nome', value= item["item"])
-                    total = st.number_input('Total', value = item["qnt_total"], step=1)
-                    estoque = st.number_input('Estoque', value = item["qnt_estoque"], step=1)
-                    emprestimo = st.number_input('Emprestáveis', value = item["qnt_emprestimo"], step=1)
-                    emprestados = st.number_input('Emprestados', value = item["qnt_emprestados"], step=1)
-                    quebrados = st.number_input('Quebrados',value = item["qnt_quebrados"],  step=1)
-                    descricao = st.text_input('Descrição', value= item["descricao"])
-                
-                    submitted = st.form_submit_button("Salvar")
-                    if submitted:
-                        data = {
-                            "item": {
-                                "item": item["item"],
-                                "qnt_total": item["qnt_total"],
-                                "qnt_estoque": item["qnt_estoque"],
-                                "qnt_emprestimo": item["qnt_emprestimo"],
-                                "qnt_emprestados": item["qnt_emprestados"],
-                                "qnt_quebrados": item["qnt_quebrados"],
-                                "descricao": item["descricao"]
-                            },
-                            "item2": {
-                                "item": item["item"],
-                                "qnt_total": total,
-                                "qnt_estoque": estoque,
-                                "qnt_emprestimo": emprestimo,
-                                "qnt_emprestados": emprestados,
-                                "qnt_quebrados": quebrados,
-                                "descricao": descricao
-                            }
-                        }
-
-                        url = 'https://rentup.up.railway.app/item/edit-item'
-                        response = requests.put(url, json=data,headers=headers)
-                        if response == 200:
-                            st.toast('Item editado com sucesso', icon="✅")
+                            
+                            
