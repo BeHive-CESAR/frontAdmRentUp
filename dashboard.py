@@ -96,7 +96,7 @@ def dashboard():
             fig = go.Figure(data=[go.Bar(
                 x=nomes,
                 y=valores,
-                marker_color='blue'  # Cor do marcador pode ser um valor único ou um iterável
+                marker_color=colors # Cor do marcador pode ser um valor único ou um iterável
             )])
             
             fig.update_layout(title_text='Itens Mais Emprestados')

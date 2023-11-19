@@ -119,29 +119,7 @@ def inventario():
                 imagem = st.text_input('URL da Imagem')
 
                 cols = st.columns([5,1.5,1,1])    
-                with cols[2]:
-                    if st.form_submit_button("Deletar"):  
-                    
-                        url = 'https://rentup.up.railway.app/item/delete-item'
-                        
-                        data = {
-                            "nome": searchInput
-                        }
-
-                        response = requests.delete(url, json=data,headers=headers)
-
-                        if response.status_code == 200:
-                            st.rerun()
-                        elif response.status_code == 400:
-                            st.error("A solicitação não atende aos requisitos (por exemplo, campos em branco, formato inválido).")
-                        elif response.status_code == 401:
-                            st.error(" Acesso não autorizado. Somente administradores podem criar itens.")
-                        elif response.status_code == 403:
-                            st.error("Falha na autenticação. O token de acesso fornecido não é válido.")
-                        elif response.status_code == 404:
-                            st.error(" Nenhum item com o nome especificado foi encontrado no estoque.")
-                
-                
+            
                 with cols[3]:
                     if st.form_submit_button("Salvar"):
                         data = {                  
@@ -173,7 +151,7 @@ def inventario():
                         elif response == 404:
                             st.error("Nenhum item com o nome original especificado foi encontrado no estoque.")
 
-
+                            
         # TABELA DOS ITENS #        
         dataTable_container = st.container()
         with dataTable_container:
@@ -189,7 +167,8 @@ def inventario():
 
             df = pd.DataFrame.from_dict(requestData["itens"])
             df.columns = ['Item', 'Total', 'Em estoque', 'Emprestáveis', 'Emprestados', 'Quebrados', 'Descrição', 'Imagem']
-
+            df = df.drop(columns=['Imagem'])
+            
             if searchInput != None:
                 response = requests.get(f"https://rentup.up.railway.app/item/get-item-by-name?item={searchInput}", headers=headers)
 
@@ -203,11 +182,36 @@ def inventario():
 
                 df = pd.DataFrame([item])
                 df.columns = ['Item', 'Total', 'Em estoque', 'Emprestáveis', 'Emprestados', 'Quebrados', 'Descrição', 'Imagem']
+                df = df.drop(columns=['Imagem'])
             
             
              # Criar DataFrame
             st.dataframe(df,hide_index=True,width=1000) 
             
+            if searchInput != None:
+                cols = st.columns([4,1.5,1,1])    
+                
+                with cols[3]:
+                    if st.button("Deletar"):  
+                        url = 'https://rentup.up.railway.app/item/delete-item'
+                        
+                        data = {
+                            "nome": searchInput
+                        }
+
+                        response = requests.delete(url, json=data,headers=headers)
+
+                        if response.status_code == 200:
+                            st.rerun()
+                        elif response.status_code == 400:
+                            st.error("A solicitação não atende aos requisitos (por exemplo, campos em branco, formato inválido).")
+                        elif response.status_code == 401:
+                            st.error(" Acesso não autorizado. Somente administradores podem criar itens.")
+                        elif response.status_code == 403:
+                            st.error("Falha na autenticação. O token de acesso fornecido não é válido.")
+                        elif response.status_code == 404:
+                            st.error(" Nenhum item com o nome especificado foi encontrado no estoque.")
+
 
                             
                             
