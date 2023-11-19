@@ -42,13 +42,13 @@ def inventario():
                     st.session_state.adicionarItem = True
                     #st.rerun()
 
+        #Form de adicionar um item
         if st.session_state.adicionarItem == True:
             with st.form("Adicionar", True):
                 
                 st.text("Adicionar item")
                 
                 nome = st.text_input('Nome')
-                total = st.number_input('Total', step=1)
                 estoque = st.number_input('Estoque', step=1)
                 emprestimo = st.number_input('Emprestáveis', step=1)
                 emprestados = st.number_input('Emprestados',  step=1)
@@ -71,7 +71,6 @@ def inventario():
                 if submitted:
                     data = {     
                         "nome": nome,
-                        "qntTotal": total,
                         "qntEstoque": estoque,
                         "qntEmprestar": emprestimo,
                         "qntEmprestados": emprestados,
@@ -83,19 +82,16 @@ def inventario():
                     url = 'https://rentup.up.railway.app/item/create-item'
                     response = requests.post(url, json=data, headers=headers)
 
-                    if response == 201:
+                    if response.status_code == 201:
                         st.session_state.adicionarItem = False
                         st.rerun()
-                    elif response == 400:
+                    elif response.status_code == 400:
                         st.error("A solicitação não atende aos requisitos (por exemplo, campos em branco, formato inválido).")
-                    elif response == 401:
+                    elif response.status_code == 401:
                         st.error("Acesso não autorizado. Somente administradores podem criar itens.")
-                    elif response == 403:
+                    elif response.status_code == 403:
                         st.error("Falha na autenticação. O token de acesso fornecido não é válido.")
                         
-            
-                
-    
         
         # FORMS DE EDITAR UM ITEM #
         if searchInput != None:  
@@ -114,10 +110,7 @@ def inventario():
 
                 item = response.json()['item']
                 
-
-                
                 nome = st.text_input('Nome', value = item["nome_item"])
-                total = st.number_input('Total', value = item["qnt_total"], step=1)
                 estoque = st.number_input('Estoque', value =  item["qnt_estoque"], step=1)
                 emprestimo = st.number_input('Emprestáveis', value =  item["qnt_emprestar"], step=1)
                 emprestados = st.number_input('Emprestados', value =  item["qnt_emprestados"], step=1)
@@ -128,6 +121,7 @@ def inventario():
                 cols = st.columns([5,1.5,1,1])    
                 with cols[2]:
                     if st.form_submit_button("Deletar"):  
+                    
                         url = 'https://rentup.up.railway.app/item/delete-item'
                         
                         data = {
@@ -146,7 +140,8 @@ def inventario():
                             st.error("Falha na autenticação. O token de acesso fornecido não é válido.")
                         elif response.status_code == 404:
                             st.error(" Nenhum item com o nome especificado foi encontrado no estoque.")
-
+                
+                
                 with cols[3]:
                     if st.form_submit_button("Salvar"):
                         data = {                  
@@ -155,7 +150,6 @@ def inventario():
                             },
                             "item2": {
                                 "nome": nome,
-                                "qntTotal": total,
                                 "qntEstoque": estoque,
                                 "qntEmprestar": emprestimo,
                                 "qntEmprestados": emprestados,
