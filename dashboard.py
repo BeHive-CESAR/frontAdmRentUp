@@ -68,17 +68,55 @@ def dashboard():
 
     ##Tabela de aprovação de empréstimos
     with st.container():
+        if 'aprovar' not in st.session_state:
+            st.session_state.aprovar = False
         
+        cols_down = st.columns([6.5, 1,1])
+        with cols_down[0]:
+            st.markdown('<p class="mediumFont">Solicitações de Empréstimo</p>', unsafe_allow_html=True)
+        with cols_down[2]:
+           if st.button("Aprovar", type='secondary'):
+               st.session_state.aprovar = True
+       
+        if st.session_state.aprovar:
+            with st.form("Aprovar", True):
+                st.write("Aprovar Solicitação")
+
+                id_emprestimo = st.text_input('ID do Empréstimo')
+                novo_status = st.selectbox('Novo Status:', ('APROVED', 'DISAPROVED'))
+
+                cols = st.columns([5.5,1,0.8])
+                with cols[1]:
+                    calcelar = st.form_submit_button("Cancelar")
+                with cols[2]:
+                    submitted = st.form_submit_button("Enviar")
+
+                if submitted:
+                    response = requests.put(f"https://rentup.up.railway.app/rent/update-status?id_rent={id_emprestimo}&stat={novo_status}", headers=headers)
+
+                    if response.status_code == 200:
+                        st.session_state.aprovar = False
+                        st.toast("Solicitação Aprovada")
+                        st.rerun()
+                    elif response.status_code == 401:
+                        st.toast("Não autorizado")
+                    elif response.status_code == 403:
+                        st.toast("Não autorizado")
+                    elif response.status_code == 404:
+                        st.toast("Nenhum empréstimo com o ID especificado foi encontrado no sistema")   
+                if calcelar:
+                    st.session_state.aprovar = False
+                    st.rerun()   
+
+     
         response = requests.get("https://rentup.up.railway.app/rent/history", headers=headers)
         data = json.loads(response.text)
 
         df = pd.DataFrame(data)
+
         df_update = df[df['estado'] == 'WAITING']
         df_update.columns = ['ID', 'Usuário', 'Item', 'Data do Empréstimo', 'Data da Devolução', 'Status']
-        
-        st.markdown('<p class="mediumFont">Solicitações de Empréstimo</p>', unsafe_allow_html=True)
-        #st.markdown("")
-        
+
         st.dataframe(df_update,hide_index=True, use_container_width=True)  # Same as st.write(df)
 
         

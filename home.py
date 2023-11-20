@@ -90,9 +90,9 @@ def cadastro(): #Função de cadastro
         contato = st.text_input('Número') 
         nome = st.text_input('Nome')  
         password = st.text_input('Senha',  type="password")
-        st.caption('A senha deve conter uma letra maiúscula e um caractere especial')
-        
-        cols = st.columns([5,1,0.8])        
+        st.caption('A senha deve conter uma letra maiúscula e um caractere especial') 
+       
+        cols = st.columns([5.5,1,0.8])        
         
         with cols[1]:    
             if st.form_submit_button("Cancelar"):

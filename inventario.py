@@ -91,7 +91,7 @@ def inventario():
                 imagem = st.text_input('URL da imagem')
 
         
-                cols = st.columns([5,1,1])
+                cols = st.columns([5.5,1,0.8])
                 
                 with cols[1]:
                     cancel = st.form_submit_button("Cancelar")
@@ -150,7 +150,7 @@ def inventario():
                     descricao = st.text_input('Descrição', value=  item["descricao"])      
                     imagem = st.text_input('URL da Imagem')
 
-                    cols = st.columns([5,1,1])    
+                    cols = st.columns([5.5,1,0.8])  
         
                     with cols[1]:
                         cancel = st.form_submit_button("Cancelar")
