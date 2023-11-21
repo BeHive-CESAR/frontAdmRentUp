@@ -130,7 +130,8 @@ def dashboard():
         with cols_down[0]:      
             num_itens = len(data["itens_mais_emprestados"])
 
-            colors = ['lightslategray',] * 3
+            colors = ['#AD2910', '#D93D04', '#027373']
+            
             valores = [item["qnt_emprestados"] for item in data["itens_mais_emprestados"]][:num_itens]
             nomes = [item["nome"] for item in data["itens_mais_emprestados"]][:num_itens]
            
@@ -149,7 +150,9 @@ def dashboard():
         with cols_down[2]:
             #st.markdown('<p class="mediumFont">Mais Emprestados</p>', unsafe_allow_html=True)
             num_itens = len(data["itens_mais_danificados"])
-            colors = ['lightslategray',] * 3
+            
+            colors = ['#AD2910', '#D93D04', '#027373']
+            
             valores = [item["danificados"] for item in data["itens_mais_danificados"]][:num_itens]
             nomes = [item["nome"] for item in data["itens_mais_danificados"]][:num_itens]
 

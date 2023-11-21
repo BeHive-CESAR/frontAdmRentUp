@@ -47,7 +47,7 @@ def inventario():
             with col2:
                 if st.session_state.editarItem == True and searchInput != None:
            
-                    if st.button("Deletar", use_container_width=True):
+                    if st.button("Deletar", use_container_width=True, type= "primary"):
                         
                         url = 'https://rentup.up.railway.app/item/delete-item'
                         
@@ -73,7 +73,7 @@ def inventario():
                             st.toast('Nenhum item com o nome especificado foi encontrado no estoque.', icon="⚠️")
 
                 else:
-                    if st.button("Adicionar", use_container_width=True):
+                    if st.button("Adicionar", use_container_width=True, type= "secondary"):
                         st.session_state.adicionarItem = True
 
         #Form de adicionar um item

@@ -51,7 +51,7 @@ def usuarios():
                 email = requestData[0]['email']	
                 cargo = requestData[0]['role']
 
-                with st.form("Editar Usuario", True):
+                with st.form("Editar Usuario", False):
                     st.text('Editar Usuário')
                 
                     role = st.selectbox('Cargo', ['ADMINISTRATOR', 'USER'], placeholder=cargo, index= None)
@@ -69,13 +69,14 @@ def usuarios():
                     if submit_button:
                         requestData = requests.put(f'https://rentup.up.railway.app/user/edit-role?email={email}&role={role}', headers=headers)
                         st.toast('Usuário editado com sucesso!')
-                        st.session_state.editarUsuario = False
                         #st.rerun()
+                        st.session_state.editarUsuario = False
+                        
 
-                cols = st.columns([4.5,1])
+                cols = st.columns([4.5,1.5])
 
                 with cols[1]:
-                    if st.button('Excluir Usuário'):
+                    if st.button('Excluir Usuário', type='primary', use_container_width=True):
                         requestData = requests.delete(f'https://rentup.up.railway.app/user/delete-user?email={email}', headers=headers)
                         st.toast('Usuário excluído com sucesso!')
                         st.session_state.editarUsuario = False
