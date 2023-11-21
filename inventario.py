@@ -60,7 +60,7 @@ def inventario():
                         if response.status_code == 204:
                             st.toast('Item excluído com sucesso', icon="✅")
                             st.rerun()
-                            
+                        
                         if response.status_code == 409:
                             st.toast('O item não pode ser excluído porque ainda está emprestado.', icon="⚠️")
                         elif response.status_code == 400:

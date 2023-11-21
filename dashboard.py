@@ -71,11 +71,11 @@ def dashboard():
         if 'aprovar' not in st.session_state:
             st.session_state.aprovar = False
         
-        cols_down = st.columns([6.5, 1,1])
+        cols_down = st.columns([6.5, 1,1.5])
         with cols_down[0]:
             st.markdown('<p class="mediumFont">Solicitações de Empréstimo</p>', unsafe_allow_html=True)
         with cols_down[2]:
-           if st.button("Aprovar", type='secondary'):
+           if st.button("Aprovar", type='secondary', use_container_width=True):
                st.session_state.aprovar = True
        
         if st.session_state.aprovar:
@@ -116,6 +116,7 @@ def dashboard():
 
         df_update = df[df['estado'] == 'WAITING']
         df_update.columns = ['ID', 'Usuário', 'Item', 'Data do Empréstimo', 'Data da Devolução', 'Status']
+        df_update = df_update.drop(columns=['Data da Devolução'])
 
         st.dataframe(df_update,hide_index=True, use_container_width=True)  # Same as st.write(df)
 
