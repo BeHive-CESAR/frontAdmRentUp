@@ -112,16 +112,13 @@ def cadastro(): #Função de cadastro
             }
                
             response = requests.post(url, json=data) #Tratamnento de erros#
+            error_message = response.json().get('detail')
             
             if response.status_code == 201: #Se o usuário for logado com sucesso 
                 st.session_state.cadastro = False
                 st.rerun()
-            elif response.status_code == 400:
-                st.error('A solicitação de registro não atende aos requisitos')
-            elif response.status_code == 409:
-                st.error('Conflito de dados. O endereço de e-mail já está em uso por outro usuário.')
             else:
-                st.error("Credenciais Inválidas")
+                st.error(error_message)
                     
 
 if 'cadastro' not in st.session_state:
