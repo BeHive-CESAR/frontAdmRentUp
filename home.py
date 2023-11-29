@@ -5,8 +5,6 @@ from PIL import Image
 import requests
 from api_permissions import check_status
 
-# Adminstrador: [admin@cesar.school] e [Admin123@]
-# Usuário: [user@user.com] e [User100%]
 
 def login(): # FUNÇÃO DE LOGIN
     
@@ -85,7 +83,7 @@ def cadastro(): #Função de cadastro
 
     st.header('Cadastro', divider='orange')
     
-    with st.form("RegisterForms", True): #Se for administrador, pede pra preencher o forms de login
+    with st.form("RegisterForms", False): #Se for administrador, pede pra preencher o forms de login
         email = st.text_input('Email')    
         contato = st.text_input('Número') 
         nome = st.text_input('Nome')  
