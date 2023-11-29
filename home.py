@@ -29,7 +29,7 @@ def login(): # FUNÇÃO DE LOGIN
             email = st.text_input('Email')    
             senha = st.text_input('Senha',  type="password")
 
-            login_cols = st.columns([5,2.5,1])    
+            login_cols = st.columns([4.5,1,0.8])    
             with login_cols[2]:
                 submitted = st.form_submit_button("Enviar")
 
@@ -62,7 +62,7 @@ def login(): # FUNÇÃO DE LOGIN
                 else:
                     st.error("Credenciais Inválidas")
 
-        cancel_cols = st.columns([6, 1])                
+        cancel_cols = st.columns([5, 1])                
         with cancel_cols[1]:
             if st.button("Cadastro", type='secondary'):
                 st.session_state.cadastro = True
@@ -90,7 +90,7 @@ def cadastro(): #Função de cadastro
         password = st.text_input('Senha',  type="password")
         st.caption('A senha deve conter uma letra maiúscula e um caractere especial') 
        
-        cols = st.columns([5.5,1,0.8])        
+        cols = st.columns([4.5,1,0.8])          
         
         with cols[1]:    
             if st.form_submit_button("Cancelar"):
@@ -112,14 +112,17 @@ def cadastro(): #Função de cadastro
             }
                
             response = requests.post(url, json=data) #Tratamnento de erros#
-            error_message = response.json().get('detail')
+          
             
             if response.status_code == 201: #Se o usuário for logado com sucesso 
                 st.session_state.cadastro = False
                 st.rerun()
+            elif response.status_code == 400:
+                st.error('A solicitação de registro não atende aos requisitos')
+            elif response.status_code == 409:
+                st.error('Conflito de dados. O endereço de e-mail já está em uso por outro usuário.')
             else:
-                st.error(error_message)
-                    
+                st.error("Credenciais Inválidas")
 
 if 'cadastro' not in st.session_state:
     st.session_state.cadastro = False

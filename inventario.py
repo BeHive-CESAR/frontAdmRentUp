@@ -27,11 +27,6 @@ def inventario():
             with col1:
                 url = 'https://rentup.up.railway.app/item/get-items'
                 requestData = requests.get(url, headers=headers).json()
-                error_message = requestData.get('detail')
-                
-                if requestData != 200:
-                    st.error(error_message)
-        
                     
                 df = pd.DataFrame.from_dict(requestData["itens"])
 
@@ -55,13 +50,18 @@ def inventario():
                         }
 
                         response = requests.delete(url, json=data,headers=headers)
-                        error_message = response.json().get('detail')
-                        
-                        if response.status_code == 204:
-                            st.toast('Item excluído com sucesso', icon="✅")
-                            st.rerun()
-                        else:   
-                            st.toast(error_message, icon="⚠️")
+                       
+                        if response.status_code == 409:
+                            st.toast('O item não pode ser excluído porque ainda está emprestado.', icon="⚠️")
+                        elif response.status_code == 400:
+                            st.toast('A solicitação não atende aos requisitos (por exemplo, campos em branco, formato inválido).', icon="⚠️")
+                        elif response.status_code == 401:
+                            st.toast('Acesso não autorizado. Somente administradores podem criar itens.', icon="⚠️")
+                        elif response.status_code == 403:
+                            st.toast('Falha na autenticação. O token de acesso fornecido não é válido.', icon="⚠️")     
+                        elif response.status_code == 404:
+                            st.toast('Nenhum item com o nome especificado foi encontrado no estoque.', icon="⚠️")
+                            
                 else:
                     if st.button("Adicionar", use_container_width=True, type= "secondary"):
                         st.session_state.adicionarItem = True
@@ -81,7 +81,7 @@ def inventario():
                 imagem = st.text_input('URL da imagem')
 
         
-                cols = st.columns([5.5,1,0.8])
+                cols = st.columns([4.5,1,0.8])  
                 
                 with cols[1]:
                     cancel = st.form_submit_button("Cancelar")
@@ -105,14 +105,19 @@ def inventario():
 
                     url = 'https://rentup.up.railway.app/item/create-item'
                     response = requests.post(url, json=data, headers=headers)
-                    error_message = response.json().get('detail')
+                
                     
                     if response.status_code == 201:
                         st.toast('Item adicionado com sucesso', icon="✅")
                         st.session_state.adicionarItem = False
                         st.rerun()
-                    else:
-                        st.toast(error_message, icon="⚠️")
+                    elif response.status_code == 400:
+                        st.toast("A solicitação não atende aos requisitos (por exemplo, campos em branco, formato inválido).", icon="⚠️")
+                    elif response.status_code == 401:
+                        st.toast("Acesso não autorizado. Somente administradores podem criar itens.", icon="⚠️")
+                    elif response.status_code == 403:
+                        st.toast("Falha na autenticação. O token de acesso fornecido não é válido.", icon="⚠️")
+
                              
         # FORMS DE EDITAR UM ITEM #
         if st.session_state.editarItem == True and searchInput != None:  
@@ -136,14 +141,14 @@ def inventario():
                     descricao = st.text_input('Descrição', value=  item["descricao"])      
                     imagem = st.text_input('URL da Imagem')
 
-                    cols = st.columns([5.5,1,0.8])  
+                    cols = st.columns([4.5,1,0.8])  
         
                     with cols[1]:
                         cancel = st.form_submit_button("Cancelar")
 
                     with cols[2]:
                         submitted = st.form_submit_button("Salvar")
-
+                        
                     if cancel:
                         st.session_state.editarItem = False
 
@@ -166,12 +171,21 @@ def inventario():
 
                         url = 'https://rentup.up.railway.app/item/edit-item'
                         response = requests.put(url, json=data,headers=headers)
-                        error_message = response.json().get('detail')
                         
-                        if response == 200:
-                            st.toast('Item adicionado com sucesso', icon="✅")
+                        
+                          
+                        if response == 400:
+                            st.error("A solicitação não atende aos requisitos (por exemplo, campos em branco, formato inválido).")
+                        elif response == 401:
+                            st.error("Acesso não autorizado. Somente administradores podem criar itens.")
+                        elif response == 403:
+                            st.error("Falha na autenticação. O token de acesso fornecido não é válido.")
+                        elif response == 404:
+                            st.error("Nenhum item com o nome original especificado foi encontrado no estoque.")
                         else:
-                            st.error(error_message)
+                            st.toast('Item editado com sucesso', icon="✅")
+                            st.session_state.editarItem = False
+                            st.rerun()
                                                  
         # TABELA DOS ITENS #        
         dataTable_container = st.container()
@@ -179,14 +193,13 @@ def inventario():
             
             url = 'https://rentup.up.railway.app/item/get-items'
             requestData = requests.get(url, headers=headers).json()
-            error_message = requestData.json().get('detail')
 
         
         if requestData == 404:
-            st.error(error_message)
+            st.error("Nenhum item foi encontrado no estoque.")
 
         elif requestData == 403:
-            st.error(error_message)
+            st.error("Falha na autenticação. O token de acesso fornecido não é válido.")
 
         else:
             df = pd.DataFrame.from_dict(requestData["itens"])
@@ -195,16 +208,22 @@ def inventario():
             
             if searchInput != None and st.session_state.editarItem == True:
                 response = requests.get(f"https://rentup.up.railway.app/item/get-item-by-name?item={searchInput}", headers=headers)
-                error_message = response.json().get('detail')
-              
-                if response == 200:
+               
+                if response == 400:
+                    st.error("A solicitação não atende aos requisitos (por exemplo, campos em branco, formato inválido).")
+                elif response == 401:
+                    st.error("Acesso não autorizado. Somente administradores podem criar itens.")
+                elif response == 403:
+                    st.error("Falha na autenticação. O token de acesso fornecido não é válido.")
+                elif response == 404:
+                    st.error("Nenhum item com o nome original especificado foi encontrado no estoque.")
+                elif response == 200:
                     item = response.json()['item']
 
                     df = pd.DataFrame([item])
                     df.columns = ['Item', 'Total', 'Em estoque', 'Emprestáveis', 'Emprestados', 'Quebrados', 'Descrição', 'Imagem']
                     df = df.drop(columns=['Imagem'])
-                else:
-                    error_message = response.json().get('detail')
+                   
             
              # Criar DataFrame
             st.dataframe(df,hide_index=True,width=1000) 
